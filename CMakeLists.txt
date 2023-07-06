@@ -3,7 +3,7 @@
 #
 # Please see the included LICENSE file for more information.
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.8)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -15,7 +15,7 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release CACHE TYPE INTERNAL)
 set(ARCH native CACHE STRING "CPU to build for: -march value or default")
 
-project(turtlecoin-crypto)
+project(kryptokrona-crypto)
 
 # Required for finding Threads on ARM
 enable_language(C)
@@ -254,12 +254,11 @@ else()
   # Override our release flags for emscripten compatibility
   set(CMAKE_C_FLAGS_DEBUG "")
   set(CMAKE_CXX_FLAGS_DEBUG "")
-  set(CMAKE_C_FLAGS_RELEASE "-O3 --llvm-lto 3 -DNDEBUG -Wno-unused-variable")
-  set(CMAKE_CXX_FLAGS_RELEASE "-O3 --llvm-lto 3 -DNDEBUG -Wno-unused-variable")
+  set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG -Wno-unused-variable")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -Wno-unused-variable")
 
   set(JS_LINKFLAGS
     --llvm-opts 3
-    --llvm-lto 3
     --closure 1
     -s SINGLE_FILE=1
     -s EXPORT_NAME="'TurtleCoinCrypto'"

@@ -2,18 +2,12 @@
 
 # Set up emscripten
 
-if [[ -z "${EMSDK}" ]]; then
-  echo "Installing emscripten..."
-  echo ""
-  if [[ ! -e ./emsdk/emsdk ]]; then
-    git submodule init
-    git submodule update
-  fi
-  cd emsdk && git pull
-  ./emsdk install latest && ./emsdk activate latest
-  source ./emsdk_env.sh
-  cd ..
-fi
+echo "Installing emscripten..."
+echo ""
+cd emsdk
+./emsdk install latest && ./emsdk activate latest
+source ./emsdk_env.sh
+cd ..
 
 # This applies a patch to fastcomp to make sure that the
 # environment is set correctly for react environments
