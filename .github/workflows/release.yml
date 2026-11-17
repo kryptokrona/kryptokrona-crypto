@@ -51,8 +51,8 @@ jobs:
         include:
           - { os: ubuntu-24.04, platform: linux-x64-gnu, target: x86_64-unknown-linux-gnu, test: true }
           - { os: ubuntu-24.04-arm, platform: linux-arm64-gnu, target: aarch64-unknown-linux-gnu, test: true }
-          - { os: macos-13, platform: darwin-x64, target: x86_64-apple-darwin, test: true }
-          - { os: macos-14, platform: darwin-arm64, target: aarch64-apple-darwin, test: true }
+          - { os: macos-15-intel, platform: darwin-x64, target: x86_64-apple-darwin, test: true }
+          - { os: macos-15, platform: darwin-arm64, target: aarch64-apple-darwin, test: true }
           - { os: windows-2022, platform: win32-x64-msvc, target: x86_64-pc-windows-msvc, test: true }
     steps:
       - uses: actions/checkout@v4
@@ -110,7 +110,7 @@ jobs:
 
   ios:
     name: iOS XCFramework
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Rust toolchain
