@@ -2,7 +2,7 @@
 
 `tx-v2-clsag.json` and `tx-v2-view-tags.json` are byte-identical copies of
 `docs/test-vectors/tx-v2-clsag.json` and `docs/test-vectors/tx-v2-view-tags.json` from the Rust
-node repository (`xkr`), github.com/kryptokrona/xkr, commit `9555e5f`, where they
+node repository (`xkr`), github.com/kryptokrona/xkr, tag `v1.0.0`, where they
 are generated and checked by `crates/xkr-wallet-core/tests/tx_v2_clsag.rs` and
 `crates/xkr-wallet-core/tests/tx_v2_view_tags.rs`. Do not edit them here; regenerate them on the
 Rust side and copy them again.

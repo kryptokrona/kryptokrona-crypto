@@ -138,7 +138,7 @@ npm run build-android      # Android libraries (NDK, cargo-ndk); see scripts/bui
 npm run build-ios          # iOS XCFramework (macOS + Xcode); see scripts/build-ios.sh
 ```
 
-Run cargo from `rust/`. `rust/Cargo.toml` takes the node's crates from a pinned git revision
+Run cargo from `rust/`. `rust/Cargo.toml` takes the node's crates from a release tag of the node repository
 (`[workspace.metadata.xkr]`). To build against a local checkout of the node repository instead
 (next to this one by default), switch to path dependencies and back before committing:
 
@@ -147,15 +147,15 @@ Run cargo from `rust/`. `rust/Cargo.toml` takes the node's crates from a pinned 
 ./scripts/xkr-source.sh git
 ```
 
-CI checks that the committed manifest uses the git revision (`scripts/check-native.sh manifest`).
+CI checks that the committed manifest uses the git tag (`scripts/check-native.sh manifest`).
 
 ### Updating the crypto core
 
 1. The change lands in the node repository (`xkr`): `xkr-crypto`, new `xkr-crypto-ffi`
    functions, test vectors, and an ABI version bump when the C ABI changes.
-2. Set `rev` in `[workspace.metadata.xkr]` of `rust/Cargo.toml`, run
+2. Set `tag` in `[workspace.metadata.xkr]` of `rust/Cargo.toml` to the new release tag, run
    `scripts/xkr-source.sh git` and `cargo update -p xkr-crypto-ffi` in `rust/`, copy
-   `include/xkr_crypto_ffi.h` of that revision to `cpp/` (`scripts/check-native.sh header`
+   `include/xkr_crypto_ffi.h` of that release to `cpp/` (`scripts/check-native.sh header`
    compares them).
 3. Extend `spec/`, `cpp/`, `typescript/native.ts` and the addon for new functions.
 4. Run the Rust and mocha tests; CI builds every prebuilt.

@@ -7,10 +7,10 @@
 #   mobile  the static library the React Native C++ TurboModule links (staticlib, the C ABI of
 #           cpp/xkr_crypto_ffi.h) -> prebuilt/ios, prebuilt/android
 #
-# The xkr crates come from the git revision in [workspace.metadata.xkr]. Development against a
+# The xkr crates come from the release tag in [workspace.metadata.xkr]. Development against a
 # local checkout of the node repository (also while that repository is not reachable):
 #   ../scripts/xkr-source.sh local [path, default ../../xkr]   # path dependencies
-#   ../scripts/xkr-source.sh git                               # back to the pinned revision
+#   ../scripts/xkr-source.sh git                               # back to the release tag
 # Commit only the git form (scripts/check-native.sh manifest checks it).
 [workspace]
 resolver = "3"
@@ -24,18 +24,18 @@ license = "GPL-3.0"
 repository = "https://github.com/kryptokrona/kryptokrona-crypto"
 publish = false
 
-# The node repository and the revision the three xkr-* dependencies use (written into
+# The node repository and the release tag the three xkr-* dependencies use (written into
 # [workspace.dependencies] by scripts/xkr-source.sh git).
 [workspace.metadata.xkr]
 repository = "https://github.com/kryptokrona/xkr"
-rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc"
+tag = "v1.0.0"
 
 [workspace.dependencies]
-# One revision of the node repository for all three crates; bump them together
+# One release of the node repository for all three crates; bump them together
 # (README.md, "Updating the crypto core").
-xkr-crypto-ffi = { git = "https://github.com/kryptokrona/xkr", rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc" }
-xkr-crypto     = { git = "https://github.com/kryptokrona/xkr", rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc" }
-xkr-types      = { git = "https://github.com/kryptokrona/xkr", rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc" }
+xkr-crypto-ffi = { git = "https://github.com/kryptokrona/xkr", tag = "v1.0.0" }
+xkr-crypto     = { git = "https://github.com/kryptokrona/xkr", tag = "v1.0.0" }
+xkr-types      = { git = "https://github.com/kryptokrona/xkr", tag = "v1.0.0" }
 kryptokrona-crypto-extra = { path = "extra" }
 hex            = "=0.4.3"
 argon2         = { version = "=0.5.3", default-features = false, features = ["alloc"] }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Consistency checks of the native parts (no build of their own):
-#   manifest rust/Cargo.toml takes the xkr crates from the pinned git revision (not a local path)
-#   header   cpp/xkr_crypto_ffi.h is the header of the pinned xkr-crypto-ffi revision
+#   manifest rust/Cargo.toml takes the xkr crates from the git release tag (not a local path)
+#   header   cpp/xkr_crypto_ffi.h is the header of the pinned xkr-crypto-ffi release
 #   symbols  a built static library exports every function the header declares
 # usage: scripts/check-native.sh manifest
 #        scripts/check-native.sh header
@@ -16,7 +16,7 @@ case ${1:-} in
     manifest)
         lines=$(grep -E '^xkr-(crypto-ffi|crypto|types) *=' rust/Cargo.toml)
         if [[ $(grep -c 'git = ' <<< "$lines") == 3 ]]; then
-            echo "manifest: xkr crates from the pinned git revision"
+            echo "manifest: xkr crates from the git release tag"
         else
             echo "manifest: rust/Cargo.toml uses local xkr paths; run scripts/xkr-source.sh git" >&2
             echo "$lines" >&2
@@ -30,7 +30,7 @@ case ${1:-} in
         if cmp -s "$HEADER" "$upstream"; then
             echo "header: $HEADER = $upstream"
         else
-            echo "header: $HEADER differs from $upstream (copy it after bumping the revision)" >&2
+            echo "header: $HEADER differs from $upstream (copy it after bumping the tag)" >&2
             diff "$HEADER" "$upstream" >&2 || true
             exit 1
         fi

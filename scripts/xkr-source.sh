@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Switches the three xkr-* dependencies of rust/Cargo.toml between
-#   git    the pinned revision of [workspace.metadata.xkr] (the committed form), and
+#   git    the release tag of [workspace.metadata.xkr] (the committed form), and
 #   local  path dependencies on a checkout of the node repository (development, and builds
 #          while the repository is not reachable; Cargo needs network access for a git
 #          source even when a [patch] replaces it).
@@ -16,9 +16,9 @@ meta() {
 case ${1:-} in
     git)
         url=$(meta repository)
-        rev=$(meta rev)
-        [[ -n $url && -n $rev ]] || { echo "no [workspace.metadata.xkr] repository/rev" >&2; exit 2; }
-        source_of() { echo "{ git = \"$url\", rev = \"$rev\" }"; }
+        tag=$(meta tag)
+        [[ -n $url && -n $tag ]] || { echo "no [workspace.metadata.xkr] repository/tag" >&2; exit 2; }
+        source_of() { echo "{ git = \"$url\", tag = \"$tag\" }"; }
         ;;
     local)
         dir=${2:-../../xkr}
