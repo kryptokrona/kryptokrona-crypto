@@ -1,0 +1,20 @@
+[package]
+name = "kryptokrona-crypto-mobile"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "Static library with the C ABI of xkr-crypto-ffi (cpp/xkr_crypto_ffi.h) for the React Native TurboModule."
+
+[lib]
+crate-type = ["staticlib"]
+test = false
+doctest = false
+
+[dependencies]
+xkr-crypto-ffi = { workspace = true }
+
+[lints]
+workspace = true

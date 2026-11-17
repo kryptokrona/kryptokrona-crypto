@@ -1,24 +1,175 @@
 // Copyright (c) 2018-2020, The TurtleCoin Developers
+// Copyright (c) 2026, The Kryptokrona Developers
 //
 // Please see the included LICENSE file for more information.
 
 import * as assert from 'assert';
+import * as fs from 'fs';
+import * as path from 'path';
 import { keccak256 } from 'js-sha3';
 import { before, describe, it } from 'mocha';
-import { Crypto } from '../';
+import { Crypto, CryptoType, findPowShare, processBlockOutputs } from '../';
+
+/* Fork 14 vectors exported by the Rust node (see tests/vectors/README.md) */
+const loadVectors = (name: string): any =>
+    JSON.parse(fs.readFileSync(path.join(__dirname, 'vectors', name), 'utf8'));
+
+const viewTagVectors = loadVectors('tx-v2-view-tags.json');
+
+const clsagVectors = loadVectors('tx-v2-clsag.json');
 
 const TurtleCoinCrypto = new Crypto();
 
-if (process.env.FORCE_JS) {
-    if (TurtleCoinCrypto.forceJSCrypto()) {
-        console.warn('Performing tests with JS Cryptographic library');
-    } else {
-        console.warn('Could not activate JS Cryptographic library');
-        process.exit(1);
-    }
-} else {
-    console.warn('Performing tests with C++ Cryptographic library');
+if (TurtleCoinCrypto.type !== CryptoType.NAPI) {
+    console.error('The Node-API addon is not loaded: run `npm run build-napi` (or set KRYPTOKRONA_CRYPTO_NAPI)');
+    process.exit(1);
 }
+
+console.warn('Performing tests with the Node-API addon');
+
+const hashTestData =
+    '0100fb8e8ac805899323371bb790db19218afd8db8e3755d8b90f39b3d5506a9' +
+    'abce4fa912244500000000ee8146d49fa93ee724deb57d12cbc6c6f3b924d946' +
+    '127c7a97418f9348828f0f02';
+
+describe('Node-API addon', () => {
+    it('Is the backend, and there is no JS build to switch to', () => {
+        assert.strictEqual(TurtleCoinCrypto.type, CryptoType.NAPI);
+
+        assert.strictEqual(TurtleCoinCrypto.isNative, true);
+
+        assert.strictEqual(TurtleCoinCrypto.isReady, true);
+
+        assert.strictEqual(TurtleCoinCrypto.forceJSCrypto(), false);
+
+        assert.strictEqual(TurtleCoinCrypto.type, CryptoType.NAPI);
+    });
+
+    it('Key pairs carry the public key that belongs to the private key', async () => {
+        const base = 'dd0c02d3202634821b4d9d91b63d919725f5c3e97e803f3512e52fb0dc2aab0c';
+
+        for (const index of [0, 1, 64]) {
+            const keys = await TurtleCoinCrypto.generateDeterministicSubwalletKeys(base, index);
+
+            assert.strictEqual(keys.public_key, await TurtleCoinCrypto.secretKeyToPublicKey(keys.private_key));
+        }
+
+        const viewKeys = await TurtleCoinCrypto.generateViewKeysFromPrivateSpendKey(base);
+
+        assert.strictEqual(viewKeys.public_key, await TurtleCoinCrypto.secretKeyToPublicKey(viewKeys.private_key));
+
+        assert.strictEqual(
+            viewKeys.private_key, await TurtleCoinCrypto.generatePrivateViewKeyFromPrivateSpendKey(base));
+
+        const random = await TurtleCoinCrypto.generateKeys();
+
+        assert.strictEqual(random.public_key, await TurtleCoinCrypto.secretKeyToPublicKey(random.private_key));
+    });
+
+    it('Input the addon refuses rejects with a message naming the argument', async () => {
+        /* both pass the wrapper's own checks (hex of the right length) */
+        const notAPoint = '4a078e76cd41a3d3b534b83dc6f2ea2de500b653ca82273b7bfad8045d85a400';
+
+        await assert.rejects(
+            TurtleCoinCrypto.scalarmultKey(notAPoint, '02' + '00'.repeat(31)),
+            /key_image_a: not a valid public key/);
+
+        await assert.rejects(TurtleCoinCrypto.cn_slow_hash_v1('00'), /data can not be hashed/);
+    });
+
+    it('tree_hash_from_branch of the first hash gives the tree hash', async () => {
+        const hashes = [
+            'b542df5b6e7f5f05275c98e7345884e2ac726aeeb07e03e44e0389eb86cd05f0',
+            '1b606a3f4a07d6489a1bcd07697bd16696b61c8ae982f61a90160f4e52828a7f',
+            'c9fae8425d8688dc236bcdbc42fdb42d376c6ec190501aa84b04a4b4cf1ee122',
+            '871fcd6823f6a879bb3f33951c8e8e891d4043880b02dfa1bb3be498b50e7578'
+        ];
+
+        const branch = await TurtleCoinCrypto.tree_branch(hashes);
+
+        assert.strictEqual(
+            await TurtleCoinCrypto.tree_hash_from_branch(branch, hashes[0], 0),
+            await TurtleCoinCrypto.tree_hash(hashes));
+    });
+
+    it('scalarmultKey: l times a key image is the identity', async () => {
+        const l = 'edd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010';
+
+        const identity = '0100000000000000000000000000000000000000000000000000000000000000';
+
+        const keyImage = await TurtleCoinCrypto.generateKeyImage(
+            'bb55bef919d1c9f74b5b52a8a6995a1dc4af4c0bb8824f5dc889012bc748173d',
+            'e52ece5717f01843e3accc4df651d669e339c31eb8059145e881faae19ad4a0e');
+
+        assert.strictEqual(await TurtleCoinCrypto.scalarmultKey(keyImage, l), identity);
+
+        const two = '02' + '00'.repeat(31);
+
+        assert.notStrictEqual(await TurtleCoinCrypto.scalarmultKey(keyImage, two), identity);
+    });
+
+    it('processBlockOutputs finds the outputs of a wallet', async () => {
+        const view = await TurtleCoinCrypto.generateKeys();
+
+        const spend = await TurtleCoinCrypto.generateKeys();
+
+        const tx = await TurtleCoinCrypto.generateKeys();
+
+        const derivation = await TurtleCoinCrypto.generateKeyDerivation(view.public_key, tx.private_key);
+
+        const key = await TurtleCoinCrypto.derivePublicKey(derivation, 1, spend.public_key);
+
+        const other = await TurtleCoinCrypto.derivePublicKey(derivation, 0, tx.public_key);
+
+        const block = {
+            transactions: [{
+                keyOutputs: [{ key: other, amount: 1, globalIndex: 10 }, { key, amount: 25, globalIndex: 11 }],
+                hash: 'aa'.repeat(32),
+                transactionPublicKey: tx.public_key
+            }]
+        };
+
+        const found = await processBlockOutputs(
+            block, view.private_key, [{ publicKey: spend.public_key, privateKey: spend.private_key }], false, true);
+
+        const ephemeral = await TurtleCoinCrypto.deriveSecretKey(derivation, 1, spend.private_key);
+
+        assert.deepStrictEqual(found, [{
+            publicSpendKey: spend.public_key,
+            input: {
+                keyImage: await TurtleCoinCrypto.generateKeyImage(key, ephemeral),
+                amount: 25,
+                transactionIndex: 1,
+                globalOutputIndex: 11,
+                key,
+                parentTransactionHash: 'aa'.repeat(32)
+            }
+        }]);
+    });
+
+    it('findPowShare finds a share for the easiest target and refuses unusable input', async () => {
+        const share = await findPowShare(hashTestData, 'ffffffff', 7, 100);
+
+        if (share === null || share.nonce === undefined || share.result === undefined) {
+            throw new Error('no share for the easiest target');
+        }
+
+        assert(share.hashes_performed >= 1 && share.threads >= 1);
+
+        /* the nonce sits at offset 39 of this blob */
+        const blob = hashTestData.substr(0, 78) + share.nonce + hashTestData.substr(86);
+
+        assert.strictEqual(share.result, await TurtleCoinCrypto.cn_turtle_lite_slow_hash_v2(blob));
+
+        assert.strictEqual(await findPowShare('', 'ffffffff', 0, 1), null);
+
+        assert.strictEqual(await findPowShare(hashTestData, '00000000', 0, 1), null);
+    });
+
+    it('cn_soft_shell_slow_hash_v* are not provided', async () => {
+        await assert.rejects(TurtleCoinCrypto.cn_soft_shell_slow_hash_v0(hashTestData, 1000));
+    });
+});
 
 describe('Cryptography', function () {
     describe('Core', () => {
@@ -27,6 +178,21 @@ describe('Cryptography', function () {
 
             assert(keys.public_key);
             assert(keys.private_key);
+        });
+
+        it('Generate Random Keys - 1000 calls yield 1000 distinct key pairs', async () => {
+            const secretKeys = new Set<string>();
+            const publicKeys = new Set<string>();
+
+            for (let i = 0; i < 1000; i++) {
+                const keys = await TurtleCoinCrypto.generateKeys();
+
+                secretKeys.add(keys.private_key);
+                publicKeys.add(keys.public_key);
+            }
+
+            assert(secretKeys.size === 1000);
+            assert(publicKeys.size === 1000);
         });
 
         it('Check Key - Public Key', async () => {
@@ -918,6 +1084,184 @@ describe('Hash Generation Methods', function () {
     it('chukwa_slow_hash_base [4 iterations, 1024KB, 1 thread]', async function () {
         const hash = await TurtleCoinCrypto.chukwa_slow_hash_base(testdata, 4, 1024, 1);
         assert(hash === '3578c135261366a7bac407b8c0ff50f3ad96f096ec2813e9644e6e77a43f803d');
+    });
+});
+
+describe('Transaction Version 2 (Fork 14)', function () {
+    describe('View Tags', () => {
+        it('Monero derive_view_tag vectors', async () => {
+            assert(viewTagVectors.monero.length === 70);
+
+            for (const vector of viewTagVectors.monero) {
+                const viewTag = await TurtleCoinCrypto.deriveViewTag(vector.derivation, vector.index);
+
+                assert.strictEqual(viewTag, vector.view_tag, vector.derivation + ' / ' + vector.index);
+            }
+        });
+
+        for (const tx of viewTagVectors.transactions) {
+            it(tx.wallet + ', tx key ' + tx.tx_public_key.substr(0, 8), async () => {
+                const wallet = viewTagVectors.wallets.find((elem: any) => elem.name === tx.wallet);
+
+                assert(wallet);
+
+                /* Sender (8*r*A) and recipient (8*a*R) reach the same derivation */
+                const recipientDerivation = await TurtleCoinCrypto.generateKeyDerivation(
+                    tx.tx_public_key, wallet.view_secret);
+
+                const senderDerivation = await TurtleCoinCrypto.generateKeyDerivation(
+                    wallet.view_public, tx.tx_secret_key);
+
+                assert.strictEqual(recipientDerivation, tx.derivation);
+
+                assert.strictEqual(senderDerivation, tx.derivation);
+
+                for (const tag of tx.tags) {
+                    const viewTag = await TurtleCoinCrypto.deriveViewTag(tx.derivation, tag.index);
+
+                    assert.strictEqual(viewTag, tag.view_tag, 'index ' + tag.index);
+                }
+            });
+        }
+
+        it('Refuses a malformed derivation and index', async () => {
+            await assert.rejects(TurtleCoinCrypto.deriveViewTag('00', 0));
+
+            await assert.rejects(TurtleCoinCrypto.deriveViewTag(viewTagVectors.monero[0].derivation, -1));
+
+            await assert.rejects(TurtleCoinCrypto.deriveViewTag(viewTagVectors.monero[0].derivation, 1.5));
+        });
+    });
+
+    describe('CLSAG', () => {
+        it('Domain separators', () => {
+            const pad32 = (text: string) => Buffer.from(text, 'ascii').toString('hex').padEnd(64, '0');
+
+            assert.strictEqual(clsagVectors.agg_domain, pad32('XKR_CLSAG_agg_0'));
+
+            assert.strictEqual(clsagVectors.round_domain, pad32('XKR_CLSAG_round'));
+        });
+
+        for (const vector of clsagVectors.vectors) {
+            const title = vector.name + ' (ring size ' + vector.ring_size + ', signer ' + vector.signer_index + ')';
+
+            describe(title, () => {
+                it('Secret, public key and key image', async () => {
+                    const publicKey = await TurtleCoinCrypto.secretKeyToPublicKey(vector.secret);
+
+                    assert.strictEqual(publicKey, vector.ring[vector.signer_index]);
+
+                    const keyImage = await TurtleCoinCrypto.generateKeyImage(
+                        vector.ring[vector.signer_index], vector.secret);
+
+                    assert.strictEqual(keyImage, vector.key_image);
+                });
+
+                it('Verifies', async () => {
+                    const valid = await TurtleCoinCrypto.clsagVerify(
+                        vector.message, vector.ring, vector.key_image, vector.c1, vector.s);
+
+                    assert.strictEqual(valid, true);
+                });
+
+                it('Re-signing with the explicit randomness reproduces c1 and s', async () => {
+                    const signature = await TurtleCoinCrypto.clsagSign(
+                        vector.message, vector.ring, vector.secret, vector.signer_index,
+                        vector.alpha, vector.decoy_responses);
+
+                    assert.strictEqual(signature.c1, vector.c1);
+
+                    assert.deepStrictEqual(signature.s, vector.s);
+                });
+            });
+        }
+
+        describe('Negative cases (n = 11, l = 5)', () => {
+            it('Case list', () => {
+                assert.strictEqual(clsagVectors.negative.length, 26);
+
+                assert.strictEqual(clsagVectors.negative[0].name, 'original');
+
+                assert.strictEqual(clsagVectors.negative[0].expected, true);
+            });
+
+            for (const negative of clsagVectors.negative) {
+                it(negative.name + ' -> ' + negative.expected, async () => {
+                    const valid = await TurtleCoinCrypto.clsagVerify(
+                        negative.message, negative.ring, negative.key_image, negative.c1, negative.s);
+
+                    assert.strictEqual(valid, negative.expected);
+                });
+            }
+        });
+
+        it('Round trip with fresh randomness (vector ring n11_l5)', async () => {
+            const vector = clsagVectors.vectors.find((elem: any) => elem.name === 'n11_l5');
+
+            const signature = await TurtleCoinCrypto.clsagSign(
+                vector.message, vector.ring, vector.secret, vector.signer_index);
+
+            assert.strictEqual(signature.s.length, vector.ring.length);
+
+            assert.notStrictEqual(signature.c1, vector.c1);
+
+            assert(await TurtleCoinCrypto.clsagVerify(
+                vector.message, vector.ring, vector.key_image, signature.c1, signature.s));
+
+            const otherMessage = await TurtleCoinCrypto.cn_fast_hash(vector.message);
+
+            assert(!await TurtleCoinCrypto.clsagVerify(
+                otherMessage, vector.ring, vector.key_image, signature.c1, signature.s));
+        });
+
+        it('Round trip with fresh keys at every signer index', async () => {
+            const prefixHash = 'b542df5b6e7f5f05275c98e7345884e2ac726aeeb07e03e44e0389eb86cd05f0';
+
+            const keys = [];
+
+            for (let i = 0; i < 4; i++) {
+                keys.push(await TurtleCoinCrypto.generateKeys());
+            }
+
+            const ring = keys.map(elem => elem.public_key);
+
+            for (let l = 0; l < ring.length; l++) {
+                const keyImage = await TurtleCoinCrypto.generateKeyImage(ring[l], keys[l].private_key);
+
+                const signature = await TurtleCoinCrypto.clsagSign(prefixHash, ring, keys[l].private_key, l);
+
+                assert(await TurtleCoinCrypto.clsagVerify(prefixHash, ring, keyImage, signature.c1, signature.s));
+            }
+        });
+
+        it('Refuses a secret that does not belong to the real index', async () => {
+            const vector = clsagVectors.vectors.find((elem: any) => elem.name === 'n4_l2');
+
+            await assert.rejects(TurtleCoinCrypto.clsagSign(
+                vector.message, vector.ring, vector.secret, (vector.signer_index + 1) % vector.ring_size));
+
+            await assert.rejects(TurtleCoinCrypto.clsagSign(
+                vector.message, vector.ring, vector.secret, (vector.signer_index + 1) % vector.ring_size,
+                vector.alpha, vector.decoy_responses));
+        });
+
+        it('Refuses malformed randomness', async () => {
+            const vector = clsagVectors.vectors.find((elem: any) => elem.name === 'n4_l2');
+
+            /* one decoy response short */
+            await assert.rejects(TurtleCoinCrypto.clsagSign(
+                vector.message, vector.ring, vector.secret, vector.signer_index,
+                vector.alpha, vector.decoy_responses.slice(1)));
+
+            /* alpha without decoy responses */
+            await assert.rejects(TurtleCoinCrypto.clsagSign(
+                vector.message, vector.ring, vector.secret, vector.signer_index, vector.alpha));
+
+            /* a non-canonical alpha (l itself) */
+            await assert.rejects(TurtleCoinCrypto.clsagSign(
+                vector.message, vector.ring, vector.secret, vector.signer_index,
+                'edd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010', vector.decoy_responses));
+        });
     });
 });
 

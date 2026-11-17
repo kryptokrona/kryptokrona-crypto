@@ -1,0 +1,55 @@
+// Android library of kryptokrona-crypto: runs React Native codegen for the spec
+// (spec/NativeKryptokronaCrypto.ts) and carries the empty KryptokronaCryptoPackage that lets
+// autolinking include the library. The module itself is C++ (../cpp), built by CMakeLists.txt
+// into the app's libappmodules.so through autolinking (../react-native.config.js) and linked
+// against ../prebuilt/android/<abi>/libkryptokrona_crypto_mobile.a.
+
+buildscript {
+    ext.safeExtGet = { prop, fallback ->
+        rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.8.2"
+    }
+}
+
+apply plugin: "com.android.library"
+apply plugin: "com.facebook.react"
+
+android {
+    namespace "se.kryptokrona.crypto"
+    compileSdkVersion safeExtGet("compileSdkVersion", 35)
+
+    defaultConfig {
+        minSdkVersion safeExtGet("minSdkVersion", 24)
+        targetSdkVersion safeExtGet("targetSdkVersion", 35)
+    }
+
+    buildFeatures {
+        buildConfig false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.facebook.react:react-android"
+}
+
+react {
+    jsRootDir = file("../spec/")
+    libraryName = "KryptokronaCryptoSpec"
+    codegenJavaPackageName = "se.kryptokrona.crypto"
+}

@@ -1,0 +1,19 @@
+[package]
+name = "kryptokrona-crypto-extra"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "The parts of kryptokrona-crypto's Crypto API that only the Node.js backend provides: multisig helpers, scalarmultKey, tree_hash_from_branch, Chukwa."
+
+[dependencies]
+xkr-crypto-ffi = { workspace = true }
+xkr-crypto     = { workspace = true }
+xkr-types      = { workspace = true }
+hex            = { workspace = true }
+argon2         = { workspace = true }
+
+[lints]
+workspace = true

@@ -25,16 +25,38 @@ export interface IPreparedRingSignatures {
     k: string;
 }
 /**
+ * A single-key CLSAG signature (transaction version 2)
+ */
+export interface IClsagSignature {
+    /**
+     * The challenge c1 (= c_0)
+     */
+    c1: string;
+    /**
+     * The responses s_0 .. s_{n-1}, one per ring member in ring order
+     */
+    s: string[];
+}
+/**
  * Represents the type of underlying cryptographic methods
  */
 export declare enum CryptoType {
     UNKNOWN = 0,
+    /** No longer used: the C++ (node-gyp) addon of 1.x, replaced by NAPI in 2.0.0 (the value is kept) */
     NODEADDON = 1,
+    /** No longer used: the WASM build was removed in 1.1.0 (the value is kept) */
     WASM = 2,
+    /** No longer used: the WASM build was removed in 1.1.0 (the value is kept) */
     WASMJS = 3,
+    /** No longer used: the JS (asm.js) build was removed in 2.0.0 (the value is kept) */
     JS = 4,
     MIXED = 5,
-    EXTERNAL = 6
+    /** No module of our own: the functions registered in Crypto.userCryptoFunctions */
+    EXTERNAL = 6,
+    /** The Node-API addon (Node.js and Electron), on the Rust crypto core */
+    NAPI = 7,
+    /** The React Native Turbo Native Module KryptokronaCrypto, on the Rust crypto core */
+    REACTNATIVE = 8
 }
 /** @ignore */
 export interface IModuleSettings {
@@ -53,11 +75,17 @@ export interface ICryptoConfig {
     checkRingSignatures?: (prefix_hash: string, key_image: string, input_keys: string[], signatures: string[]) => Promise<boolean>;
     checkScalar?: (private_key: string) => Promise<boolean>;
     checkSignature?: (message_digest: string, public_key: string, signature: string) => Promise<boolean>;
+    /**
+     * Called with alpha === '' and decoy_responses === [] when fresh randomness is wanted
+     */
+    clsagSign?: (prefix_hash: string, ring: string[], private_ephemeral: string, real_output_index: number, alpha: string, decoy_responses: string[]) => Promise<IClsagSignature>;
+    clsagVerify?: (prefix_hash: string, ring: string[], key_image: string, c1: string, s: string[]) => Promise<boolean>;
     cn_fast_hash?: (input_data: string) => Promise<string>;
     completeRingSignatures?: (private_ephemeral: string, real_output_index: number, k: string, signatures: string[]) => Promise<string[]>;
     derivationToScalar?: (derivation: string, output_index: number) => Promise<string>;
     derivePublicKey?: (derivation: string, output_index: number, public_key: string) => Promise<string>;
     deriveSecretKey?: (derivation: string, output_index: number, private_key: string) => Promise<string>;
+    deriveViewTag?: (derivation: string, output_index: number) => Promise<string>;
     generateDeterministicSubwalletKeys?: (private_key: string, wallet_index: number) => Promise<IKeyPair>;
     generateKeyDerivation?: (public_key: string, private_key: string) => Promise<string>;
     generateKeyDerivationScalar?: (public_key: string, private_key: string, output_index: number) => Promise<string>;

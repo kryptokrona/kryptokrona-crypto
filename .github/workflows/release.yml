@@ -1,0 +1,162 @@
+# Builds and tests kryptokrona-crypto 2.x and its prebuilt native libraries:
+#   rust      cargo test of rust/ (multisig, scalarmultKey, Chukwa) + header check
+#   napi      the Node-API addon per platform (prebuilt/napi/*.node) + the mocha tests on it
+#   android   the static library of the React Native module for four ABIs (Linux, NDK)
+#   ios       the XCFramework of the React Native module (macOS, Xcode)
+#   package   collects every prebuilt into the npm tarball (on a published release it is
+#             attached to the release; publishing to npm stays a manual step)
+#
+# The Rust crates depend on the node repository (kryptokrona/xkr) at the revision pinned in
+# rust/Cargo.toml; CI fetches it from GitHub.
+name: Build and test
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: 1.100.0
+  NDK_VERSION: 28.2.13676358
+
+jobs:
+  rust:
+    name: Rust tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Manifest uses the pinned xkr revision
+        run: ./scripts/check-native.sh manifest
+      - name: Rust toolchain
+        run: rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --component clippy,rustfmt
+      - name: Format and lints
+        working-directory: rust
+        run: |
+          cargo fmt --all --check
+          cargo clippy --workspace --all-targets -- -D warnings
+      - name: Tests
+        working-directory: rust
+        run: cargo test -p kryptokrona-crypto-extra
+      - name: Header of the pinned crypto core
+        run: ./scripts/check-native.sh header
+
+  napi:
+    name: Node-API ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, platform: linux-x64-gnu, target: x86_64-unknown-linux-gnu, test: true }
+          - { os: ubuntu-24.04-arm, platform: linux-arm64-gnu, target: aarch64-unknown-linux-gnu, test: true }
+          - { os: macos-13, platform: darwin-x64, target: x86_64-apple-darwin, test: true }
+          - { os: macos-14, platform: darwin-arm64, target: aarch64-apple-darwin, test: true }
+          - { os: windows-2022, platform: win32-x64-msvc, target: x86_64-pc-windows-msvc, test: true }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Rust toolchain
+        shell: bash
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          rustup target add --toolchain "$RUST_TOOLCHAIN" "${{ matrix.target }}"
+      - name: Install
+        run: npm ci --ignore-scripts
+      - name: Build
+        shell: bash
+        run: |
+          npm run build
+          npx napi build --platform --release --target "${{ matrix.target }}" --cargo-cwd rust/napi --js false --dts kryptokrona-crypto.d.ts prebuilt/napi
+          ls prebuilt/napi
+      - name: Test
+        if: matrix.test
+        run: npm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: napi-${{ matrix.platform }}
+          path: prebuilt/napi/kryptokrona-crypto.${{ matrix.platform }}.node
+          if-no-files-found: error
+
+  android:
+    name: Android static libraries
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain and cargo-ndk
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          rustup target add --toolchain "$RUST_TOOLCHAIN" aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
+          cargo install cargo-ndk --version 3.5.4 --locked
+      - name: NDK
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+      - name: Build
+        run: ./scripts/build-android.sh
+      - name: Exported functions
+        run: |
+          for abi in arm64-v8a armeabi-v7a x86_64 x86; do
+            ./scripts/check-native.sh symbols "prebuilt/android/$abi/libkryptokrona_crypto_mobile.a"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: prebuilt/android
+          if-no-files-found: error
+
+  ios:
+    name: iOS XCFramework
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          rustup target add --toolchain "$RUST_TOOLCHAIN" aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+      - name: Build
+        run: ./scripts/build-ios.sh
+      - name: Exported functions
+        run: ./scripts/check-native.sh symbols rust/target/aarch64-apple-ios/release/libkryptokrona_crypto_mobile.a
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: prebuilt/ios
+          if-no-files-found: error
+
+  package:
+    name: npm package
+    needs: [rust, napi, android, ios]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Collect the prebuilt libraries
+        run: |
+          mkdir -p prebuilt/napi prebuilt/android prebuilt/ios
+          cp artifacts/napi-*/*.node prebuilt/napi/
+          cp -r artifacts/android/* prebuilt/android/
+          cp -r artifacts/ios/* prebuilt/ios/
+          find prebuilt -type f | sort
+      - name: Pack
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+          npm pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: kryptokrona-crypto-*.tgz
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" kryptokrona-crypto-*.tgz

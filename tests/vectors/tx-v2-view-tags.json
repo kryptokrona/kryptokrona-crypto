@@ -1,0 +1,694 @@
+{
+  "description": "Fork-14 view tags (docs/tx-v2.md §3): view_tag(D, i) = cn_fast_hash(\"view_tag\" || D || varint(i))[0]. Secrets are H_s(\"xkr tx-v2 vectors \" || label). Generated and checked by crates/xkr-wallet-core/tests/tx_v2_view_tags.rs.",
+  "monero": [
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 0,
+      "view_tag": "76"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 1,
+      "view_tag": "d6"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 2,
+      "view_tag": "87"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 3,
+      "view_tag": "1b"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 12,
+      "view_tag": "d6"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 13,
+      "view_tag": "e9"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 14,
+      "view_tag": "12"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 15,
+      "view_tag": "26"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 127,
+      "view_tag": "2c"
+    },
+    {
+      "derivation": "0fc47054f355ced4d67de73bfa12e4c78ff19089548fffa7d07a674741860f97",
+      "index": 128,
+      "view_tag": "11"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 0,
+      "view_tag": "70"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 1,
+      "view_tag": "81"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 2,
+      "view_tag": "a0"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 3,
+      "view_tag": "ec"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 12,
+      "view_tag": "22"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 13,
+      "view_tag": "0a"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 14,
+      "view_tag": "87"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 15,
+      "view_tag": "76"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 127,
+      "view_tag": "4b"
+    },
+    {
+      "derivation": "a36ba7b4d31349ad278a6df8f77adb76748b59f4929348e67dd92adb9fa174dc",
+      "index": 128,
+      "view_tag": "39"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 0,
+      "view_tag": "93"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 1,
+      "view_tag": "67"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 2,
+      "view_tag": "9d"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 3,
+      "view_tag": "2d"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 12,
+      "view_tag": "63"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 13,
+      "view_tag": "cf"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 14,
+      "view_tag": "ef"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 15,
+      "view_tag": "10"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 127,
+      "view_tag": "fc"
+    },
+    {
+      "derivation": "7498d5bf0b69e08653f6d420a17f866dd2bd490ab43074f46065cb501fe7e2d8",
+      "index": 128,
+      "view_tag": "73"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 0,
+      "view_tag": "90"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 1,
+      "view_tag": "5a"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 2,
+      "view_tag": "de"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 3,
+      "view_tag": "21"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 12,
+      "view_tag": "57"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 13,
+      "view_tag": "52"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 14,
+      "view_tag": "6f"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 15,
+      "view_tag": "eb"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 127,
+      "view_tag": "93"
+    },
+    {
+      "derivation": "fe7770c4b076e95ddb8026affcfab39d31c7c4a2266e0e25e343bc4badc907d0",
+      "index": 128,
+      "view_tag": "dc"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 0,
+      "view_tag": "c6"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 1,
+      "view_tag": "60"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 2,
+      "view_tag": "f0"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 3,
+      "view_tag": "71"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 12,
+      "view_tag": "0e"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 13,
+      "view_tag": "42"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 14,
+      "view_tag": "b2"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 15,
+      "view_tag": "61"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 127,
+      "view_tag": "c3"
+    },
+    {
+      "derivation": "ea9337d0ddf480abdc4fc56a0cb223702729cb230ae7b9de50243ad25ce90e8d",
+      "index": 128,
+      "view_tag": "0a"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 0,
+      "view_tag": "4c"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 1,
+      "view_tag": "9b"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 2,
+      "view_tag": "64"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 3,
+      "view_tag": "ff"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 12,
+      "view_tag": "e3"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 13,
+      "view_tag": "24"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 14,
+      "view_tag": "ea"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 15,
+      "view_tag": "3b"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 127,
+      "view_tag": "47"
+    },
+    {
+      "derivation": "25d538315bcb81aff9574189ea65f418aeb0392f5cbbc84cd8a33c7ade31ef0a",
+      "index": 128,
+      "view_tag": "5a"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 0,
+      "view_tag": "74"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 1,
+      "view_tag": "77"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 2,
+      "view_tag": "a9"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 3,
+      "view_tag": "44"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 12,
+      "view_tag": "75"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 13,
+      "view_tag": "05"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 14,
+      "view_tag": "ca"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 15,
+      "view_tag": "00"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 127,
+      "view_tag": "a6"
+    },
+    {
+      "derivation": "8edfabada2b24ef4d8d915826c9ff0245910e4b835b59c2cf8ed8fc991b2e1e8",
+      "index": 128,
+      "view_tag": "0d"
+    }
+  ],
+  "salt": "766965775f746167",
+  "transactions": [
+    {
+      "derivation": "0bd5fdc8a78bb4a436d20babeec5cbfc506f07f192e88f425ab5824e46aad47e",
+      "tags": [
+        {
+          "index": 0,
+          "index_varint": "00",
+          "view_tag": "96"
+        },
+        {
+          "index": 1,
+          "index_varint": "01",
+          "view_tag": "1b"
+        },
+        {
+          "index": 2,
+          "index_varint": "02",
+          "view_tag": "26"
+        },
+        {
+          "index": 127,
+          "index_varint": "7f",
+          "view_tag": "d3"
+        },
+        {
+          "index": 128,
+          "index_varint": "8001",
+          "view_tag": "df"
+        },
+        {
+          "index": 255,
+          "index_varint": "ff01",
+          "view_tag": "5a"
+        },
+        {
+          "index": 256,
+          "index_varint": "8002",
+          "view_tag": "c4"
+        },
+        {
+          "index": 16383,
+          "index_varint": "ff7f",
+          "view_tag": "a3"
+        },
+        {
+          "index": 16384,
+          "index_varint": "808001",
+          "view_tag": "49"
+        }
+      ],
+      "tx_public_key": "de98dac61d8a06a12de9246f918d9ff907b039ffddb595d9d0d26b8494715b46",
+      "tx_secret_key": "844032c966c6c74cc82e8d899ef5808f48d89dbd13b3c6ab920059da6e60250c",
+      "wallet": "wallet_1"
+    },
+    {
+      "derivation": "47a3cc2ca5cfa5ab517265086cfeca7f119fbc65c3786e3e951be00b603b0b0d",
+      "tags": [
+        {
+          "index": 0,
+          "index_varint": "00",
+          "view_tag": "64"
+        },
+        {
+          "index": 1,
+          "index_varint": "01",
+          "view_tag": "e7"
+        },
+        {
+          "index": 2,
+          "index_varint": "02",
+          "view_tag": "80"
+        },
+        {
+          "index": 127,
+          "index_varint": "7f",
+          "view_tag": "2b"
+        },
+        {
+          "index": 128,
+          "index_varint": "8001",
+          "view_tag": "c4"
+        },
+        {
+          "index": 255,
+          "index_varint": "ff01",
+          "view_tag": "59"
+        },
+        {
+          "index": 256,
+          "index_varint": "8002",
+          "view_tag": "3d"
+        },
+        {
+          "index": 16383,
+          "index_varint": "ff7f",
+          "view_tag": "6b"
+        },
+        {
+          "index": 16384,
+          "index_varint": "808001",
+          "view_tag": "e5"
+        }
+      ],
+      "tx_public_key": "560506a36c3f24e24a0acf0204fcb11dc6610ffd61339abc49a88054002f172c",
+      "tx_secret_key": "5c3b619404e79d99a957bf9bdd5b2ac76d417e89151d0fa0f91f78c4e5f76709",
+      "wallet": "wallet_1"
+    },
+    {
+      "derivation": "782343af8b33716881045e31feadce2abb6873b001e9eb82f817a702aced5194",
+      "tags": [
+        {
+          "index": 0,
+          "index_varint": "00",
+          "view_tag": "28"
+        },
+        {
+          "index": 1,
+          "index_varint": "01",
+          "view_tag": "e1"
+        },
+        {
+          "index": 2,
+          "index_varint": "02",
+          "view_tag": "f5"
+        },
+        {
+          "index": 127,
+          "index_varint": "7f",
+          "view_tag": "ff"
+        },
+        {
+          "index": 128,
+          "index_varint": "8001",
+          "view_tag": "74"
+        },
+        {
+          "index": 255,
+          "index_varint": "ff01",
+          "view_tag": "a2"
+        },
+        {
+          "index": 256,
+          "index_varint": "8002",
+          "view_tag": "28"
+        },
+        {
+          "index": 16383,
+          "index_varint": "ff7f",
+          "view_tag": "7d"
+        },
+        {
+          "index": 16384,
+          "index_varint": "808001",
+          "view_tag": "3b"
+        }
+      ],
+      "tx_public_key": "9f4330e97be87590037d88c24c88d84b915d1db8e80ca67b9de3fb79ffbc6a8f",
+      "tx_secret_key": "5439eb24fcfdd497feea112c7ad66c9d208063f7b6dee1f30ac755250f76a50b",
+      "wallet": "wallet_1"
+    },
+    {
+      "derivation": "b1d31a8fbb2d93f7726571d646513880843b2077ebc5b77080896fa152ae8e5e",
+      "tags": [
+        {
+          "index": 0,
+          "index_varint": "00",
+          "view_tag": "29"
+        },
+        {
+          "index": 1,
+          "index_varint": "01",
+          "view_tag": "bd"
+        },
+        {
+          "index": 2,
+          "index_varint": "02",
+          "view_tag": "ad"
+        },
+        {
+          "index": 127,
+          "index_varint": "7f",
+          "view_tag": "59"
+        },
+        {
+          "index": 128,
+          "index_varint": "8001",
+          "view_tag": "ba"
+        },
+        {
+          "index": 255,
+          "index_varint": "ff01",
+          "view_tag": "1d"
+        },
+        {
+          "index": 256,
+          "index_varint": "8002",
+          "view_tag": "a8"
+        },
+        {
+          "index": 16383,
+          "index_varint": "ff7f",
+          "view_tag": "58"
+        },
+        {
+          "index": 16384,
+          "index_varint": "808001",
+          "view_tag": "0f"
+        }
+      ],
+      "tx_public_key": "de98dac61d8a06a12de9246f918d9ff907b039ffddb595d9d0d26b8494715b46",
+      "tx_secret_key": "844032c966c6c74cc82e8d899ef5808f48d89dbd13b3c6ab920059da6e60250c",
+      "wallet": "wallet_2"
+    },
+    {
+      "derivation": "7e7c1c84b54f3c82faf77301bdfceae00ae8ab23952ebcc5067a2dc10ab87ed4",
+      "tags": [
+        {
+          "index": 0,
+          "index_varint": "00",
+          "view_tag": "c5"
+        },
+        {
+          "index": 1,
+          "index_varint": "01",
+          "view_tag": "89"
+        },
+        {
+          "index": 2,
+          "index_varint": "02",
+          "view_tag": "65"
+        },
+        {
+          "index": 127,
+          "index_varint": "7f",
+          "view_tag": "8b"
+        },
+        {
+          "index": 128,
+          "index_varint": "8001",
+          "view_tag": "01"
+        },
+        {
+          "index": 255,
+          "index_varint": "ff01",
+          "view_tag": "db"
+        },
+        {
+          "index": 256,
+          "index_varint": "8002",
+          "view_tag": "ec"
+        },
+        {
+          "index": 16383,
+          "index_varint": "ff7f",
+          "view_tag": "66"
+        },
+        {
+          "index": 16384,
+          "index_varint": "808001",
+          "view_tag": "b8"
+        }
+      ],
+      "tx_public_key": "560506a36c3f24e24a0acf0204fcb11dc6610ffd61339abc49a88054002f172c",
+      "tx_secret_key": "5c3b619404e79d99a957bf9bdd5b2ac76d417e89151d0fa0f91f78c4e5f76709",
+      "wallet": "wallet_2"
+    },
+    {
+      "derivation": "7533c720b7611fd452961f5fc608bdc5f8ff2f6d60a3b78c763950ea5c261cb6",
+      "tags": [
+        {
+          "index": 0,
+          "index_varint": "00",
+          "view_tag": "94"
+        },
+        {
+          "index": 1,
+          "index_varint": "01",
+          "view_tag": "c5"
+        },
+        {
+          "index": 2,
+          "index_varint": "02",
+          "view_tag": "52"
+        },
+        {
+          "index": 127,
+          "index_varint": "7f",
+          "view_tag": "4f"
+        },
+        {
+          "index": 128,
+          "index_varint": "8001",
+          "view_tag": "9d"
+        },
+        {
+          "index": 255,
+          "index_varint": "ff01",
+          "view_tag": "c3"
+        },
+        {
+          "index": 256,
+          "index_varint": "8002",
+          "view_tag": "37"
+        },
+        {
+          "index": 16383,
+          "index_varint": "ff7f",
+          "view_tag": "e7"
+        },
+        {
+          "index": 16384,
+          "index_varint": "808001",
+          "view_tag": "28"
+        }
+      ],
+      "tx_public_key": "9f4330e97be87590037d88c24c88d84b915d1db8e80ca67b9de3fb79ffbc6a8f",
+      "tx_secret_key": "5439eb24fcfdd497feea112c7ad66c9d208063f7b6dee1f30ac755250f76a50b",
+      "wallet": "wallet_2"
+    }
+  ],
+  "wallets": [
+    {
+      "address": "SEKReX9D6Rf7tz6tNtJiMEYw7iHUMYhWoBr8nQiEvAgr31BZS6Y6J7NHqCQ4uoHhDVHY7LSmCUaUKN4rUDfPi7MjENieB4bSRKq",
+      "name": "wallet_1",
+      "spend_public": "aef1bdaa293aeddae2978e91beea44ac558a9cd840d9cf54a0203b430bf9da24",
+      "spend_secret": "03f6a292ac63d4206d86955c96e96378649f66fe52e3af5236afd04777093b00",
+      "view_public": "dbd962ed64a035cd619b7f9462dd4e161011f0fc7df2ad1623c5b2924ff5e9a3",
+      "view_secret": "d41610836f9d1c8d97abf0dedbb6b42d625acf492b6a900b0a493f191580ee09"
+    },
+    {
+      "address": "SEKReWGx71QMywRXsFcpAxFVEQi4kpwxKXc9fvAegnejZW47Vof68rL3s4cLvEde8nBW1annVeZebD1wYDY3iqbCd6qsSfkF7Fu",
+      "name": "wallet_2",
+      "spend_public": "8d0b4fd77d70fcf975be7cf5569c4f6bdae760c8b6fb41cfd21a8228c24f7222",
+      "spend_secret": "3a6d31b97b66d4d99835f44bf2da4abdb89f2ce262735289675a3795a5630107",
+      "view_public": "3ee30011111e1b7e6ad71ec73ec6c45cdd841d6c47d719efaf717de7d7d50a3d",
+      "view_secret": "a0f07a328078a268e99563e6dbb48b07ce158c74886a32c94a8d71077eab4304"
+    }
+  ]
+}

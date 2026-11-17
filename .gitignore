@@ -167,3 +167,9 @@ test.js
 build
 jsbuild
 prebuilds
+### kryptokrona-crypto 2.x native builds
+# prebuilt/ is produced by the build scripts and CI and shipped in the npm package ("files")
+/prebuilt/
+/build/
+/rust/target/
+/target/

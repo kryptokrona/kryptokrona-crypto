@@ -10,10 +10,13 @@ const stat = promisify(fs.stat)
 const exec = promisify(childProcess.exec)
 
 /* The directories to run our formatting on, recursively */
-const directoriesToFormat = ['include', 'src', 'tests']
+const directoriesToFormat = ['cpp', 'ios']
 
 /* Filetypes to run the formatter on */
-const fileTypes = ['.h', '.cpp', '.c']
+const fileTypes = ['.h', '.cpp', '.mm']
+
+/* Copied verbatim from the node repository (xkr); never reformatted */
+const skipFiles = ['cpp/xkr_crypto_ffi.h']
 
 /* The name of the clang-format binary. In some distros this has the version
    appended. */
@@ -51,7 +54,7 @@ async function main () {
 
   /* Filter out non code files */
   filePaths = filePaths.filter((file) => {
-    return fileTypes.some((extension) => file.endsWith(extension))
+    return fileTypes.some((extension) => file.endsWith(extension)) && !skipFiles.includes(file)
   })
 
   console.log(`Found ${filePaths.length} files to format!`)

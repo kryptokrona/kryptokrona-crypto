@@ -1,24 +1,68 @@
 {
   "name": "kryptokrona-crypto",
-  "version": "1.0.1",
-  "description": "Node C++ Addon for Kryptokrona Cryptographic Functions",
+  "version": "2.0.0",
+  "description": "Kryptokrona cryptographic functions for Node.js, Electron and React Native, on the crypto core of the Kryptokrona node",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
+  "react-native": "dist/react-native.js",
+  "files": [
+    "dist/",
+    "spec/",
+    "cpp/",
+    "ios/",
+    "android/build.gradle",
+    "android/CMakeLists.txt",
+    "android/src/",
+    "prebuilt/",
+    "kryptokrona-crypto.podspec",
+    "react-native.config.js",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build-native": "run-script-os",
-    "build-native:win32": "build_js.sh",
-    "build-native:default": "./build_js.sh",
-    "build-typescript": "./node_modules/.bin/tsc",
-    "docs": "./node_modules/.bin/typedoc && touch docs/.nojekyll && git restore docs/CNAME",
-    "install": "prebuild-install --download --verbose || node-gyp rebuild",
-    "prepublishOnly": "npm run build-typescript && npm run build-native && npm run test",
-    "style": "./node_modules/.bin/eslint typescript/*.ts tests/crypto.ts",
-    "fix-style": "./node_modules/.bin/eslint --fix typescript/*.ts tests/crypto.ts",
-    "test": "npm run test-node && npm run test-js",
-    "test-all": "npm run prepublishOnly && npm test",
-    "test-js": "env FORCE_JS=1 ./node_modules/.bin/mocha --timeout 60000 --require ts-node/register tests/crypto.ts",
-    "test-node": "./node_modules/.bin/mocha --timeout 60000 --require ts-node/register tests/crypto.ts",
+    "build": "tsc",
+    "build-typescript": "tsc",
+    "build-napi": "napi build --platform --release --cargo-cwd rust/napi --js false --dts kryptokrona-crypto.d.ts prebuilt/napi",
+    "build-napi-debug": "napi build --platform --cargo-cwd rust/napi --js false --dts kryptokrona-crypto.d.ts prebuilt/napi",
+    "build-android": "./scripts/build-android.sh",
+    "build-ios": "./scripts/build-ios.sh",
+    "docs": "typedoc && touch docs/.nojekyll && git restore docs/CNAME",
+    "prepublishOnly": "npm run build && npm test",
+    "style": "eslint typescript/*.ts spec/*.ts tests/*.ts",
+    "fix-style": "eslint --fix typescript/*.ts spec/*.ts tests/*.ts",
+    "test": "npm run test-node && npm run test-react-native && npm run test-react-native-module",
+    "test-node": "mocha --timeout 60000 --require ts-node/register tests/crypto.ts",
+    "test-react-native": "mocha --timeout 60000 --require ts-node/register tests/react-native.ts",
+    "test-react-native-module": "mocha --timeout 60000 --require ts-node/register tests/react-native-module.ts",
+    "test-rust": "cd rust && cargo test -p kryptokrona-crypto-extra",
     "benchmark": "node tests/benchmark.js"
+  },
+  "codegenConfig": {
+    "name": "KryptokronaCryptoSpec",
+    "type": "modules",
+    "jsSrcsDir": "spec",
+    "android": {
+      "javaPackageName": "se.kryptokrona.crypto"
+    },
+    "ios": {
+      "modulesProvider": {
+        "KryptokronaCrypto": "KryptokronaCryptoProvider"
+      }
+    }
+  },
+  "napi": {
+    "name": "kryptokrona-crypto",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-apple-darwin",
+        "aarch64-apple-darwin",
+        "x86_64-pc-windows-msvc"
+      ]
+    }
   },
   "repository": {
     "type": "git",
@@ -28,19 +72,25 @@
     "url": "https://github.com/kryptokrona/kryptokrona-crypto/issues"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12.17"
   },
   "engineStrict": true,
   "homepage": "https://kryptokrona.se",
   "author": "The Kryptokrona Developers",
   "license": "GPL-3.0",
   "dependencies": {
-    "bindings": "^1.5.0",
-    "js-sha3": "^0.8.0",
-    "nan": "^2.14.1",
-    "prebuild-install": "^5.3.5"
+    "js-sha3": "^0.8.0"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.76"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@napi-rs/cli": "2.18.4",
     "@types/mocha": "^8.0.2",
     "@types/node": "^14.0.27",
     "@typescript-eslint/eslint-plugin": "^3.9.0",

@@ -1,0 +1,73 @@
+# Native backends of kryptokrona-crypto 2.x, all on the Kryptokrona crypto core of the node
+# (xkr: crates/xkr-crypto-ffi, xkr-crypto). See the "Native code" section of ../README.md.
+#
+#   extra   the parts of the Crypto API that only the Node.js backend has (multisig helpers,
+#           scalarmultKey, tree_hash_from_branch, Chukwa); plain Rust, tested with cargo test
+#   napi    the Node.js / Electron addon (cdylib, Node-API) -> prebuilt/napi/*.node
+#   mobile  the static library the React Native C++ TurboModule links (staticlib, the C ABI of
+#           cpp/xkr_crypto_ffi.h) -> prebuilt/ios, prebuilt/android
+#
+# The xkr crates come from the git revision in [workspace.metadata.xkr]. Development against a
+# local checkout of the node repository (also while that repository is not reachable):
+#   ../scripts/xkr-source.sh local [path, default ../../xkr]   # path dependencies
+#   ../scripts/xkr-source.sh git                               # back to the pinned revision
+# Commit only the git form (scripts/check-native.sh manifest checks it).
+[workspace]
+resolver = "3"
+members = ["extra", "napi", "mobile"]
+
+[workspace.package]
+version = "2.0.0"
+edition = "2024"
+rust-version = "1.100"
+license = "GPL-3.0"
+repository = "https://github.com/kryptokrona/kryptokrona-crypto"
+publish = false
+
+# The node repository and the revision the three xkr-* dependencies use (written into
+# [workspace.dependencies] by scripts/xkr-source.sh git).
+[workspace.metadata.xkr]
+repository = "https://github.com/kryptokrona/xkr"
+rev = "29b33378d8139b45a3159b012616c744cb5edb26"
+
+[workspace.dependencies]
+# One revision of the node repository for all three crates; bump them together
+# (README.md, "Updating the crypto core").
+xkr-crypto-ffi = { git = "https://github.com/kryptokrona/xkr", rev = "29b33378d8139b45a3159b012616c744cb5edb26" }
+xkr-crypto     = { git = "https://github.com/kryptokrona/xkr", rev = "29b33378d8139b45a3159b012616c744cb5edb26" }
+xkr-types      = { git = "https://github.com/kryptokrona/xkr", rev = "29b33378d8139b45a3159b012616c744cb5edb26" }
+kryptokrona-crypto-extra = { path = "extra" }
+hex            = "=0.4.3"
+argon2         = { version = "=0.5.3", default-features = false, features = ["alloc"] }
+napi           = { version = "2.16", default-features = false, features = ["napi6"] }
+napi-derive    = "2.16"
+napi-build     = "2.1"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+cast_possible_truncation = "allow"
+cast_sign_loss = "allow"
+needless_pass_by_value = "allow" # napi passes owned String/Vec arguments
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+# The C ABI turns a panic into XKR_CRYPTO_ERR_INTERNAL and Node-API into a JS exception;
+# both need unwinding.
+panic = "unwind"
+strip = "debuginfo"
+
+# The CryptoNight tests are unusably slow unoptimised.
+[profile.dev.package.xkr-crypto]
+opt-level = 3
+[profile.dev.package.argon2]
+opt-level = 3

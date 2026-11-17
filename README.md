@@ -1,242 +1,171 @@
-# Kryptokrona: Standalone Cryptography Library
+# Kryptokrona: Cryptography Library
 
+![Node](https://img.shields.io/badge/node-%3E%3D12.17-blue.svg) [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-yellow.svg)](https://github.com/kryptokrona/kryptokrona-crypto/blob/master/LICENSE)
 
-![Prerequisite](https://img.shields.io/badge/node-%3E%3D6-blue.svg) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/turtlecoin/turtlecoin-crypto/graphs/commit-activity) [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-yellow.svg)](https://github.com/turtlecoin/turtlecoin-crypto/blob/master/LICENSE)
+The cryptographic primitives of Kryptokrona (keys, derivations, key images, ring and CLSAG
+signatures, view tags, CryptoNight and the other slow hashes) for JavaScript:
 
-#### Master Build Status
-[![Build Status](https://github.com/turtlecoin/turtlecoin-crypto/workflows/CI%20Build%20Tests/badge.svg?branch=master)](https://github.com/turtlecoin/turtlecoin-crypto/actions)
+* **Node.js and Electron**: a Node-API addon (one prebuilt file per platform for every Node.js
+  and Electron version),
+* **React Native** (New Architecture): a C++ Turbo Native Module for iOS and Android,
+* any other runtime, with the primitives supplied by the host.
 
-#### Development Build Status
-[![Build Status](https://github.com/turtlecoin/turtlecoin-crypto/workflows/CI%20Build%20Tests/badge.svg?branch=development)](https://github.com/turtlecoin/turtlecoin-crypto/actions)
+All native code is the crypto core of the Kryptokrona node (the Rust crates `xkr-crypto-ffi` and
+`xkr-crypto` of the node repository), so wallets, Hugin and the node compute with the same
+implementation and the same test vectors.
 
-This repository contains the necessary files to compile the cryptography library used within kryptokrona as a standalone library that can be included in various other projects in a variety of development environments, including:
-
-* Node.js >= 6.x
-* C++
-* C# (via C++ shared library & P/Invoke)
-* Native Javascript
-* WASM
-
-## Javascript Library
-
-**Note:** We build prebuilds of the Node.js native addon module as well as the WASM/JS binaries that are included for distribution with the NPM installed version of this package to speed up your development efforts.
-
-### Dependencies
-
-* [Node.js](https://nodejs.org) >= +6.x LTS (or Node v11)
-
-#### Windows (if not using prebuilds)
-
-##### Prerequisites
-
-Read very careful if you want this to work right the first time.
-
-1) Open a *Windows Powershell* console as **Administrator**
-
-2) Run the command: `npm install -g windows-build-tools --vs2015`
-   ***This will take a while. Sit tight.***
-
-### Installation
+## Installation
 
 ```bash
 npm install kryptokrona-crypto
 ```
 
-### Intialization
+The package ships prebuilt native libraries for linux-x64-gnu, linux-arm64-gnu, darwin-x64,
+darwin-arm64 and win32-x64-msvc (Node-API) and for Android (arm64-v8a, armeabi-v7a, x86_64, x86)
+and iOS (device and simulator). Nothing is compiled at install time.
 
-#### TypeScript
-
-```javascript
-import { Crypto } from 'kryptokrona-crypto';
-const kryptokronaCrypto = new Crypto();
-```
-
-#### CommonJS
+## Usage
 
 ```javascript
-const Crypto = require('kryptokrona-crypto').Crypto
-const kryptokronaCrypto = new Crypto()
+import { Crypto } from 'kryptokrona-crypto';   // or: const { Crypto } = require('kryptokrona-crypto')
+
+const crypto = new Crypto();
+const keys = await crypto.generateKeys();     // { private_key, public_key }
 ```
 
-#### Documentation
+Every method returns a promise. Invalid input rejects with an `Error` naming the argument.
 
-You can find the full TypeScript/JS documentation for this library [here](https://crypto.kryptokrona.dev).
+### Entry points
 
-## C++ Library
+* `main` (`dist/index.js`, Node.js and Electron): loads
+  `prebuilt/napi/kryptokrona-crypto.<platform>.node` (`CryptoType.NAPI`). The environment variable
+  `KRYPTOKRONA_CRYPTO_NAPI` points it at another build. The addon is loaded with a computed
+  `require()`, so bundlers do not follow it; Electron apps unpack `*.node` from the asar archive
+  as usual. Without an addon for the platform the wrapper starts in `CryptoType.EXTERNAL` (below).
+* `react-native` (`dist/react-native.js`, read by Metro before `main`): uses the Turbo Native
+  Module `KryptokronaCrypto` of this package (`CryptoType.REACTNATIVE`); the app does not need to
+  register anything. Without the module (old architecture, other runtimes) it starts in
+  `CryptoType.EXTERNAL`. It never loads the Node.js addon or a Node.js module.
 
-### How To Compile
+In every mode, functions registered by the host take precedence:
 
-#### Build Optimization
+```javascript
+Crypto.userCryptoFunctions = {
+    cn_fast_hash: (data) => myNativeModule.cnFastHash(data),
+    // ...
+};
+// or: new Crypto({ ... }), which is what kryptokrona-utils' CryptoNote and
+// kryptokrona-wallet-backend-js do with their crypto config
+```
 
-The CMake build system will, by default, create optimized *native* builds for your particular system type when you build the software. Using this method, the binaries created provide a better experience and all together faster performance.
+In `CryptoType.EXTERNAL` a primitive that was not registered rejects with an error that names
+it; `cn_fast_hash` and `deriveViewTag` fall back to a JS computation (js-sha3). Wrapper methods
+check their inputs with other primitives, so register those too: most key and signature methods
+call `checkKey` and `scReduce32` (through `checkScalar`). `Crypto.isReady` is `true` once
+`cn_fast_hash` is available.
 
-However, if you wish to create *portable* binaries that can be shared between systems, specify `-DARCH=default` in your CMake arguments during the build process. Note that *portable* binaries will have a noticable difference in performance than *native* binaries. For this reason, it is always best to build for your particuar system if possible.
+### React Native
 
-#### Linux
+Requirements: React Native 0.76 or later with the New Architecture (the default since 0.76),
+iOS 15.1, Android API 24. Autolinking adds the pod (`kryptokrona-crypto.podspec`) and the
+Android library; the module is created by the app's generated C++ module provider (the
+`OnLoad.cpp` of a React Native app calls `autolinking_cxxModuleProvider`).
 
-##### Ubuntu, using GCC
+The module has the functions a mobile wallet needs: `checkKey`, `checkSignature`,
+`checkRingSignature(s)`, `cn_fast_hash`, `secretKeyToPublicKey`, `scReduce32`,
+`hashToEllipticCurve`, `hashToScalar`, `generateKeys`, `generateKeyDerivation`,
+`derivePublicKey`, `deriveSecretKey`, `underivePublicKey`, `generateKeyImage`,
+`generateSignature`, `generateRingSignatures`, `generateDeterministicSubwalletKeys`,
+`cn_turtle_lite_slow_hash_v2`, `deriveViewTag`, `clsagSign`, `clsagVerify`. The slow hash, the
+signing functions, the subwallet keys and the two exports below run on worker threads.
+
+### Wallet scan and Hugin proof of work
+
+Both entry points export two functions outside `Crypto`:
+
+* `processBlockOutputs(block, privateViewKey, spendKeys, isViewWallet, processCoinbaseTransactions)`:
+  the outputs of a wallet-backend `Block` owned by the subwallets `spendKeys`
+  (`[{ publicKey, privateKey }]`), as `[{ publicSpendKey, input: { keyImage, amount,
+  transactionIndex, globalOutputIndex, key, parentTransactionHash } }]`, coinbase first, then
+  the transactions in order. A missing `globalIndex` gives `globalOutputIndex: -1`; a view
+  wallet gets the all-zero key image; an output's `viewTag` (transaction version 2) is checked
+  first and skips the point arithmetic on a mismatch.
+* `findPowShare(blobHex, targetHex, startNonce, maxAttempts[, nonceTagBits, nonceTagValue])`:
+  `{ job_id: '', nonce, result, hashes_performed, threads }` when a share was found,
+  `{ hashes_performed, threads }` when not, `null` for unusable input. Workers:
+  `max(1, floor(0.8 × cores))`, at most 8.
+
+### Transaction version 2 (fork 14)
+
+* `deriveViewTag(derivation, output_index)`: the first byte of
+  `cn_fast_hash("view_tag" || derivation || varint(output_index))`, as two hex characters.
+* `clsagSign(prefix_hash, ring, private_ephemeral, real_output_index[, alpha, decoy_responses])`:
+  `{ c1, s }`. Without `alpha` and `decoy_responses` the randomness comes from the operating
+  system; with them (the nonce, then the `ring.length - 1` responses of the other members in the
+  order `s[l+1], .., s[l-1]`) the signature is deterministic.
+* `clsagVerify(prefix_hash, ring, key_image, c1, s)`: `true` for a valid signature.
+
+The Rust node (`xkr`) is the reference; `tests/vectors/` holds its test vectors.
+
+### Not provided natively
+
+`cn_soft_shell_slow_hash_v0/1/2` have no native implementation; they work only when the host
+registers them.
+
+## Native code
+
+```text
+rust/                 Cargo workspace (toolchain 1.100.0)
+  napi/               Node-API addon (napi-rs)              -> prebuilt/napi/*.node
+  mobile/             static library with the C ABI         -> prebuilt/android, prebuilt/ios
+  extra/              multisig helpers, scalarmultKey, tree_hash_from_branch, Chukwa (addon only)
+cpp/                  the C++ Turbo Native Module + xkr_crypto_ffi.h (the C ABI, from xkr)
+ios/                  module provider for iOS
+android/              build.gradle (codegen) + CMakeLists.txt
+spec/                 codegen spec of the module
+typescript/           the Crypto class and the entry points
+```
+
+### Building
 
 ```bash
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-sudo apt-get update
-sudo apt-get install aptitude -y
-sudo aptitude install -y build-essential git cmake
-git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona-crypto
-cd kryptokrona-crypto
-mkdir build
-cd build
-cmake ..
-make -j
+npm ci --ignore-scripts
+npm run build              # TypeScript -> dist/
+npm run build-napi         # Rust addon for this machine -> prebuilt/napi/ (needs Rust 1.100.0)
+npm test                   # mocha: Node.js addon, React Native entry point, module adapter
+npm run test-rust          # cargo test of rust/extra
+npm run build-android      # Android libraries (NDK, cargo-ndk); see scripts/build-android.sh
+npm run build-ios          # iOS XCFramework (macOS + Xcode); see scripts/build-ios.sh
 ```
 
-The static library will be built as `libturtlecoin-crypto.a` in the build folder.
-
-##### Ubuntu, using Clang
+Run cargo from `rust/`. `rust/Cargo.toml` takes the node's crates from a pinned git revision
+(`[workspace.metadata.xkr]`). To build against a local checkout of the node repository instead
+(next to this one by default), switch to path dependencies and back before committing:
 
 ```bash
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+./scripts/xkr-source.sh local            # or: ./scripts/xkr-source.sh local /path/to/xkr
+./scripts/xkr-source.sh git
 ```
 
-You need to modify the below command for your version of ubuntu - see https://apt.llvm.org/
+CI checks that the committed manifest uses the git revision (`scripts/check-native.sh manifest`).
 
-* Ubuntu 14.04 (Trusty)
-- `sudo add-apt-repository "deb https://apt.llvm.org/trusty/ llvm-toolchain-trusty 6.0 main"`
+### Updating the crypto core
 
-* Ubuntu 16.04 (Xenial)
-- `sudo add-apt-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial 6.0 main"`
-
-* Ubuntu 18.04 (Bionic)
-- `sudo add-apt-repository "deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic 6.0 main"`
-
-```bash
-sudo apt-get update
-sudo apt-get install aptitude -y
-sudo aptitude install -y -o Aptitude::ProblemResolver::SolutionCost='100*canceled-actions,200*removals'
-sudo aptitude install build-essential clang-6.0 libstdc++-7-dev git cmake
-export CC=clang-6.0
-export CXX=clang++-6.0
-git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona-crypto
-cd kryptokrona-crypto
-mkdir build
-cd build
-cmake ..
-make -j
-```
-
-The following library files will be created in the `build` folder:
-
-* `libkryptokrona-crypto-static.a`
-
-##### Generic Linux
-
-Ensure you have the dependencies listed above.
-
-If you want to use clang, ensure you set the environment variables `CC` and `CXX`.
-See the ubuntu instructions for an example.
-
-```bash
-git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona-crypto
-cd kryptokrona-crypto
-mkdir build
-cd build
-cmake ..
-make -j
-```
-
-The following library files will be created in the `build` folder:
-
-* `libturtlecoin-crypto-static.a`
-
-#### OSX/Apple, using Clang
-
-##### Prerequisites
-
-- Install XCode and Developer Tools.
-
-##### Building
-
-```bash
-which brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install --force cmake boost llvm
-export CC=/usr/local/opt/llvm/bin/clang
-export CXX=/usr/local/opt/llvm/bin/clang++
-git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona-crypto
-cd kryptokrona-crypto
-mkdir build
-cd build
-cmake ..
-make
-```
-
-The following library files will be created in the `build` folder:
-
-* `libkryptokrona-crypto-static.a`
-
-#### Windows
-
-##### Prerequisites
-
-- Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall)
-- When installing Visual Studio, it is **required** that you install **Desktop development with C++**
-
-##### Building
-
-- From the start menu, open 'x64 Native Tools Command Prompt for vs2017'.
-```
-cd <your_kryptokrona-crypto_directory>
-mkdir build
-cd build
-set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";%PATH%
-cmake -G "Visual Studio 15 2017 Win64" ..
-```
-
-**Note:** If you have errors on this step about not being able to find the some libraries, you may need to update your cmake. Open 'Visual Studio Installer' and click 'Update'.
-
-`MSBuild turtlecoin-crypto.sln /p:Configuration=Release /m`
-
-The following library files will be created in the `build/Release` folder:
-
-* `turtlecoin-crypto-static.lib`
-* `turtlecoin-crypto-shared.lib`
-* `turtlecoin-crypto-shared.dll`
-
-## Native Javascript & WASM
-
-### Prerequisites
-
-You will need the following packages:
-
-* CMake (2.8 or higher), make, and git.
-
-### Compiling
-
-```bash
-git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona-crypto
-cd kryptokrona-crypto
-source ./build_js.sh
-```
-
-This script will install the necessary dependencies on your machine and then proceed to compile the library to Native Javascript and WASM.
-
-The following library files will be created in the `jsbuild` folder:
-
-* Native Javascript
-  * `turtlecoin-crypto.js`
-* WASM
-  * `turtlecoin-crypto-wasm.js`
+1. The change lands in the node repository (`xkr`): `xkr-crypto`, new `xkr-crypto-ffi`
+   functions, test vectors, and an ABI version bump when the C ABI changes.
+2. Set `rev` in `[workspace.metadata.xkr]` of `rust/Cargo.toml`, run
+   `scripts/xkr-source.sh git` and `cargo update -p xkr-crypto-ffi` in `rust/`, copy
+   `include/xkr_crypto_ffi.h` of that revision to `cpp/` (`scripts/check-native.sh header`
+   compares them).
+3. Extend `spec/`, `cpp/`, `typescript/native.ts` and the addon for new functions.
+4. Run the Rust and mocha tests; CI builds every prebuilt.
+5. Release: a minor version adds functions, a major one removes or changes them.
 
 ## Thanks
-Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community
 
-## Copypasta for license when editing files
+Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin
+Community
 
-Hi TurtleCoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files.
+## License
 
-```
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-// Copyright (c) 2014-2018, The Monero Project
-// Copyright (c) 2018-2019, The TurtleCoin Developers
-//
-// Please see the included LICENSE file for more information.
-```
+GPL-3.0, see [LICENSE](LICENSE).

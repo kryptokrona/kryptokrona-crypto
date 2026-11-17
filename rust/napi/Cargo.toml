@@ -1,0 +1,28 @@
+[package]
+name = "kryptokrona-crypto-napi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "Node-API addon of kryptokrona-crypto (Node.js and Electron), on the Kryptokrona crypto core."
+
+[lib]
+crate-type = ["cdylib"]
+# The Node-API symbols resolve only inside a Node.js process; the logic is tested in
+# kryptokrona-crypto-extra (cargo) and through tests/crypto.ts (mocha).
+test = false
+doctest = false
+
+[dependencies]
+xkr-crypto-ffi           = { workspace = true }
+kryptokrona-crypto-extra = { workspace = true }
+napi                     = { workspace = true }
+napi-derive              = { workspace = true }
+
+[build-dependencies]
+napi-build = { workspace = true }
+
+[lints]
+workspace = true
