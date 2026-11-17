@@ -3,6 +3,17 @@
 version = 4
 
 [[package]]
+name = "aes"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fc0fc36d7440d015b45468ba08a21e80e056ebbd014c611c6298bb7503e04bd1"
+dependencies = [
+ "cipher",
+ "cpubits",
+ "cpufeatures 0.3.1",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -89,6 +100,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
+name = "cipher"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8cf2a2c93cd704877c0858356ed03480ff301ee950b43f1cbe4573b088bfa6c"
+dependencies = [
+ "crypto-common 0.2.2",
+ "inout",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -96,6 +117,12 @@ checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
 dependencies = [
  "unicode-segmentation",
 ]
+
+[[package]]
+name = "cpubits"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15b85f9c39137c3a891689859392b1bd49812121d0d61c9caf00d46ed5ce06ae"
 
 [[package]]
 name = "cpufeatures"
@@ -272,6 +299,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27f864f10dfb56725ce5ce5472bc52252c8f93a4ab86327122cebf62c5f59a17"
 dependencies = [
  "typenum",
+]
+
+[[package]]
+name = "inout"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a580c13f0ffc335ef42dd3f6b1a41b726051c5e1656d9a3aa6fddb3c5dfbbf9"
+dependencies = [
+ "hybrid-array",
 ]
 
 [[package]]
@@ -668,7 +704,8 @@ checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 
 [[package]]
 name = "xkr-consensus"
-version = "0.1.0"
+version = "1.0.0"
+source = "git+https://github.com/kryptokrona/xkr?rev=9555e5f1345923891d43b0c0143355b7dfdc03dc#9555e5f1345923891d43b0c0143355b7dfdc03dc"
 dependencies = [
  "hex",
  "thiserror",
@@ -679,8 +716,10 @@ dependencies = [
 
 [[package]]
 name = "xkr-crypto"
-version = "0.1.0"
+version = "1.0.0"
+source = "git+https://github.com/kryptokrona/xkr?rev=9555e5f1345923891d43b0c0143355b7dfdc03dc#9555e5f1345923891d43b0c0143355b7dfdc03dc"
 dependencies = [
+ "aes",
  "curve25519-dalek",
  "digest 0.10.7",
  "groestl",
@@ -695,7 +734,8 @@ dependencies = [
 
 [[package]]
 name = "xkr-crypto-ffi"
-version = "0.1.0"
+version = "1.0.0"
+source = "git+https://github.com/kryptokrona/xkr?rev=9555e5f1345923891d43b0c0143355b7dfdc03dc#9555e5f1345923891d43b0c0143355b7dfdc03dc"
 dependencies = [
  "hex",
  "serde",
@@ -708,7 +748,8 @@ dependencies = [
 
 [[package]]
 name = "xkr-serialization"
-version = "0.1.0"
+version = "1.0.0"
+source = "git+https://github.com/kryptokrona/xkr?rev=9555e5f1345923891d43b0c0143355b7dfdc03dc#9555e5f1345923891d43b0c0143355b7dfdc03dc"
 dependencies = [
  "thiserror",
  "xkr-crypto",
@@ -717,7 +758,8 @@ dependencies = [
 
 [[package]]
 name = "xkr-types"
-version = "0.1.0"
+version = "1.0.0"
+source = "git+https://github.com/kryptokrona/xkr?rev=9555e5f1345923891d43b0c0143355b7dfdc03dc#9555e5f1345923891d43b0c0143355b7dfdc03dc"
 dependencies = [
  "bytemuck",
  "hex",
@@ -726,7 +768,8 @@ dependencies = [
 
 [[package]]
 name = "xkr-wallet-core"
-version = "0.1.0"
+version = "1.0.0"
+source = "git+https://github.com/kryptokrona/xkr?rev=9555e5f1345923891d43b0c0143355b7dfdc03dc#9555e5f1345923891d43b0c0143355b7dfdc03dc"
 dependencies = [
  "hex",
  "rand_core 0.9.3",

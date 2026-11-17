@@ -28,14 +28,14 @@ publish = false
 # [workspace.dependencies] by scripts/xkr-source.sh git).
 [workspace.metadata.xkr]
 repository = "https://github.com/kryptokrona/xkr"
-rev = "29b33378d8139b45a3159b012616c744cb5edb26"
+rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc"
 
 [workspace.dependencies]
 # One revision of the node repository for all three crates; bump them together
 # (README.md, "Updating the crypto core").
-xkr-crypto-ffi = { git = "https://github.com/kryptokrona/xkr", rev = "29b33378d8139b45a3159b012616c744cb5edb26" }
-xkr-crypto     = { git = "https://github.com/kryptokrona/xkr", rev = "29b33378d8139b45a3159b012616c744cb5edb26" }
-xkr-types      = { git = "https://github.com/kryptokrona/xkr", rev = "29b33378d8139b45a3159b012616c744cb5edb26" }
+xkr-crypto-ffi = { git = "https://github.com/kryptokrona/xkr", rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc" }
+xkr-crypto     = { git = "https://github.com/kryptokrona/xkr", rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc" }
+xkr-types      = { git = "https://github.com/kryptokrona/xkr", rev = "9555e5f1345923891d43b0c0143355b7dfdc03dc" }
 kryptokrona-crypto-extra = { path = "extra" }
 hex            = "=0.4.3"
 argon2         = { version = "=0.5.3", default-features = false, features = ["alloc"] }
