@@ -6,7 +6,8 @@
 # usage: scripts/check-native.sh manifest
 #        scripts/check-native.sh header
 #        scripts/check-native.sh symbols <libkryptokrona_crypto_mobile.a>
-# Needs cargo (header: reads `cargo metadata`), jq, nm.
+# Needs cargo (header: reads `cargo metadata`), jq, and llvm-nm of the Rust toolchain
+# (`rustup component add llvm-tools`) or nm.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -38,8 +39,13 @@ case ${1:-} in
     symbols)
         lib=${2:?usage: check-native.sh symbols <lib.a>}
         want=$(grep -o 'xkr_crypto_[a-z0-9_]*(' "$HEADER" | tr -d '(' | sort -u)
-        have=$(nm -g "$lib" 2>/dev/null | awk '$2 == "T" { print $3 }' | sed 's/^_//' \
-            | grep '^xkr_crypto_' | sort -u)
+        # llvm-nm of the toolchain reads every object the Rust compiler writes; the system nm
+        # (Xcode's on macOS) may not.
+        nm=$(ls "$(cd rust && rustc --print sysroot 2>/dev/null)"/lib/rustlib/*/bin/llvm-nm 2>/dev/null | head -n1 || true)
+        nm=${nm:-nm}
+        symbols=$("$nm" -g "$lib") || { echo "symbols: $nm cannot read $lib" >&2; exit 1; }
+        have=$(awk '$2 == "T" { print $3 }' <<< "$symbols" | sed 's/^_//' \
+            | { grep '^xkr_crypto_' || true; } | sort -u)
         missing=$(comm -23 <(echo "$want") <(echo "$have"))
         if [[ -n $missing ]]; then
             echo "symbols: missing in $lib:" >&2
