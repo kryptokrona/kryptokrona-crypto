@@ -705,7 +705,7 @@ checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 [[package]]
 name = "xkr-consensus"
 version = "1.0.0"
-source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#b93346fbbf0cff4b68a4bb67d26dd0d5f5063499"
+source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#498872819c4ba7da1cda13e64be6c02620fc8529"
 dependencies = [
  "hex",
  "thiserror",
@@ -717,7 +717,7 @@ dependencies = [
 [[package]]
 name = "xkr-crypto"
 version = "1.0.0"
-source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#b93346fbbf0cff4b68a4bb67d26dd0d5f5063499"
+source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#498872819c4ba7da1cda13e64be6c02620fc8529"
 dependencies = [
  "aes",
  "curve25519-dalek",
@@ -735,7 +735,7 @@ dependencies = [
 [[package]]
 name = "xkr-crypto-ffi"
 version = "1.0.0"
-source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#b93346fbbf0cff4b68a4bb67d26dd0d5f5063499"
+source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#498872819c4ba7da1cda13e64be6c02620fc8529"
 dependencies = [
  "hex",
  "serde",
@@ -749,7 +749,7 @@ dependencies = [
 [[package]]
 name = "xkr-serialization"
 version = "1.0.0"
-source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#b93346fbbf0cff4b68a4bb67d26dd0d5f5063499"
+source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#498872819c4ba7da1cda13e64be6c02620fc8529"
 dependencies = [
  "thiserror",
  "xkr-crypto",
@@ -759,7 +759,7 @@ dependencies = [
 [[package]]
 name = "xkr-types"
 version = "1.0.0"
-source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#b93346fbbf0cff4b68a4bb67d26dd0d5f5063499"
+source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#498872819c4ba7da1cda13e64be6c02620fc8529"
 dependencies = [
  "bytemuck",
  "hex",
@@ -769,7 +769,7 @@ dependencies = [
 [[package]]
 name = "xkr-wallet-core"
 version = "1.0.0"
-source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#b93346fbbf0cff4b68a4bb67d26dd0d5f5063499"
+source = "git+https://github.com/kryptokrona/xkr?tag=v1.0.0#498872819c4ba7da1cda13e64be6c02620fc8529"
 dependencies = [
  "hex",
  "rand_core 0.9.3",
